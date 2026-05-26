@@ -1,33 +1,80 @@
 <template>
-  <section class="lista">
-    <!-- Form emite @formData; a page escuta e persiste (separação UI / dados) -->
-    <Form @formData="salvarPessoa" />
+  <div class="page page--create">
+    <header class="page-header anim-page-in">
+      <h1 class="page-header__title">
+        Novo cálculo
+      </h1>
+      <p class="page-header__lead">
+        Preencha os dados abaixo. Os registros ficam salvos no navegador (localStorage).
+      </p>
+    </header>
 
-    <table class="table is-fullwidth is-striped">
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>Peso (kg)</th>
-          <th>Altura</th>
-          <th>IMC</th>
-          <th>Classificação</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <!-- v-for no filho Table: cada item vira uma <tr> (HTML válido) -->
-      <tbody>
-        <Table
-          v-for="pessoa in pessoas"
-          :key="pessoa.id"
-          :pessoa="pessoa"
-        />
-      </tbody>
-    </table>
+    <div class="page-grid">
+      <section
+        class="panel anim-page-in anim-page-in--delay"
+        aria-labelledby="form-imc-title"
+      >
+        <h2 id="form-imc-title" class="page-header__title" style="font-size: 1.1rem;">
+          Dados
+        </h2>
+        <Form @formData="salvarPessoa" />
+      </section>
 
-    <p v-if="pessoas.length === 0" class="has-text-grey">
-      Nenhum cálculo salvo ainda. Preencha o formulário acima.
-    </p>
-  </section>
+      <section class="panel anim-page-in anim-page-in--delay" aria-labelledby="lista-imc-title">
+        <h2 id="lista-imc-title" class="page-header__title" style="font-size: 1.1rem;">
+          Histórico
+        </h2>
+
+        <transition name="fade-slide" mode="out-in">
+          <div v-if="pessoas.length === 0" key="empty" class="empty-state">
+            Nenhum cálculo salvo ainda. Preencha o formulário para começar.
+          </div>
+
+          <div v-else key="list">
+            <div class="table-wrap table-desktop">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Peso</th>
+                    <th>Altura</th>
+                    <th>IMC</th>
+                    <th>Classificação</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <transition-group name="list" tag="tbody" appear>
+                  <Table
+                    v-for="pessoa in pessoas"
+                    :key="pessoa.id"
+                    :pessoa="pessoa"
+                    :highlighted="pessoa.id === lastAddedId"
+                    layout="row"
+                  />
+                </transition-group>
+              </table>
+            </div>
+
+            <transition-group
+              name="list"
+              tag="ul"
+              class="record-list"
+              appear
+              aria-label="Lista de cálculos"
+            >
+              <Table
+                v-for="pessoa in pessoas"
+                :key="'card-' + pessoa.id"
+                :pessoa="pessoa"
+                :highlighted="pessoa.id === lastAddedId"
+                layout="card"
+              />
+            </transition-group>
+          </div>
+        </transition>
+      </section>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -39,10 +86,10 @@ export default defineComponent({
   name: 'CreatePage',
   data () {
     return {
-      pessoas: [] as IPessoa[]
+      pessoas: [] as IPessoa[],
+      lastAddedId: null as string | null
     }
   },
-  // created: hook do ciclo de vida — roda após instanciar o componente (bom para carregar localStorage)
   created () {
     this.carregarLista()
   },
@@ -52,6 +99,12 @@ export default defineComponent({
     },
     salvarPessoa (pessoa: IPessoa) {
       this.pessoas = adicionarPessoa(pessoa)
+      this.lastAddedId = pessoa.id
+      window.setTimeout(() => {
+        if (this.lastAddedId === pessoa.id) {
+          this.lastAddedId = null
+        }
+      }, 650)
     }
   }
 })

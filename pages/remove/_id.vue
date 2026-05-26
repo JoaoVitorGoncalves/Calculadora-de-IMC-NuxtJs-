@@ -1,31 +1,58 @@
 <template>
-  <div class="field lista">
-    <p class="mb-4">
-      Confirme a exclusão do registro abaixo. Os dados vêm do localStorage.
-    </p>
+  <div class="page form-page">
+    <header class="page-header anim-page-in">
+      <h1 class="page-header__title">
+        Excluir registro
+      </h1>
+      <p class="page-header__lead">
+        Confirme se deseja remover este cálculo do histórico local.
+      </p>
+    </header>
 
-    <label class="label">Nome</label>
-    <input v-model="name" class="input" type="text" disabled>
+    <section class="panel anim-page-in anim-page-in--delay">
+      <p class="form-page__notice">
+        Esta ação não pode ser desfeita. Os dados serão removidos do localStorage.
+      </p>
 
-    <label class="label">Peso (kg)</label>
-    <input v-model="peso" class="input" type="number" disabled>
+      <div class="field">
+        <label class="label">Nome</label>
+        <input v-model="name" class="input" type="text" disabled>
+      </div>
 
-    <label class="label">Altura</label>
-    <input v-model="altura" class="input" type="number" disabled>
+      <div class="form-imc__row">
+        <div class="field">
+          <label class="label">Peso (kg)</label>
+          <input v-model="peso" class="input" type="number" disabled>
+        </div>
+        <div class="field">
+          <label class="label">Altura</label>
+          <input v-model="altura" class="input" type="number" disabled>
+        </div>
+      </div>
 
-    <label class="label">IMC</label>
-    <input v-model="imc" class="input" type="text" disabled>
+      <div class="field">
+        <label class="label">IMC</label>
+        <input v-model="imc" class="input" type="text" disabled>
+      </div>
 
-    <p v-if="erro" class="error">
-      {{ erro }}
-    </p>
+      <p v-if="erro" class="form-page__error" role="alert">
+        {{ erro }}
+      </p>
 
-    <div class="buttons">
-      <nuxt-link to="/create" class="button is-light">
-        <span class="material-symbols-outlined">arrow_back</span>
-      </nuxt-link>
-      <Buttons nome="delete" class="button is-danger" @clicado="confirmarRemocao" />
-    </div>
+      <div class="actions-row">
+        <nuxt-link to="/create" class="button btn-icon" aria-label="Voltar">
+          <span class="material-symbols-outlined">arrow_back</span>
+        </nuxt-link>
+        <button
+          type="button"
+          class="button is-danger"
+          style="border-radius: 10px; font-weight: 500;"
+          @click="confirmarRemocao"
+        >
+          Confirmar exclusão
+        </button>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -71,13 +98,3 @@ export default defineComponent({
   }
 })
 </script>
-
-<style scoped>
-.error {
-  color: #f14668;
-}
-
-.mb-4 {
-  margin-bottom: 1rem;
-}
-</style>

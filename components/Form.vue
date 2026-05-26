@@ -1,87 +1,133 @@
 <template>
-  <div class="field">
-    <label class="label">Nome</label>
-    <input
-      v-model="name"
-      class="input"
-      type="text"
-      placeholder="Seu nome"
-    >
-
-    <label class="label">Peso (kg)</label>
-    <input
-      v-model.number="peso"
-      class="input"
-      type="number"
-      min="1"
-      step="0.1"
-      placeholder="Ex.: 70"
-    >
-
-    <label class="label">Altura (m ou cm)</label>
-    <input
-      v-model.number="altura"
-      class="input"
-      type="number"
-      min="0.5"
-      step="0.01"
-      placeholder="Ex.: 1,75 ou 175"
-    >
-    <p class="help">
-      Use metros (1,75) ou centímetros (175). O cálculo converte automaticamente.
-    </p>
-
-    <p v-if="imcPreview > 0" class="imc-preview">
-      IMC estimado: <strong>{{ imcPreview }}</strong> — {{ classificacaoPreview }}
-    </p>
-
-    <p v-if="empty" class="error">
-      Preencha nome, peso e altura com valores válidos.
-    </p>
-
-    <div>
-      <!-- @clicado: evento customizado emitido pelo filho (Buttons) para o pai (Form) -->
-      <Buttons nome="check" class="button is-success" @clicado="enviar" />
+  <form
+    class="form-imc"
+    :class="{ 'form-imc--shake': shake }"
+    @submit.prevent="enviar"
+    @animationend="onShakeEnd"
+  >
+    <div class="field">
+      <label class="label" for="imc-nome">Nome</label>
+      <input
+        id="imc-nome"
+        v-model="name"
+        class="input"
+        type="text"
+        placeholder="Seu nome"
+        autocomplete="name"
+      >
     </div>
-  </div>
+
+    <div class="form-imc__row">
+      <div class="field">
+        <label class="label" for="imc-peso">Peso (kg)</label>
+        <input
+          id="imc-peso"
+          v-model.number="peso"
+          class="input"
+          type="number"
+          min="1"
+          step="0.1"
+          placeholder="70"
+        >
+      </div>
+      <div class="field">
+        <label class="label" for="imc-altura">Altura (m ou cm)</label>
+        <input
+          id="imc-altura"
+          v-model.number="altura"
+          class="input"
+          type="number"
+          min="0.5"
+          step="0.01"
+          placeholder="1,75 ou 175"
+        >
+      </div>
+    </div>
+
+    <p class="form-imc__help">
+      Metros (1,75) ou centímetros (175) — a conversão é automática.
+    </p>
+
+    <transition name="fade-slide">
+      <p v-if="imcPreview > 0" key="preview" class="form-imc__preview">
+        IMC estimado: <strong>{{ imcPreview }}</strong>
+        <span :class="badgePreview"> {{ classificacaoPreview }}</span>
+      </p>
+    </transition>
+
+    <transition name="fade-slide">
+      <p v-if="empty" key="error" class="form-imc__error" role="alert">
+        Preencha nome, peso e altura com valores válidos.
+      </p>
+    </transition>
+
+    <button
+      type="submit"
+      class="button btn-primary is-fullwidth"
+      :class="{ 'btn-primary--saved': savedFlash, 'is-loading': submitting }"
+      :disabled="submitting"
+    >
+      {{ submitLabel }}
+    </button>
+  </form>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { calcularImc, classificarImc } from '~/utils/imc'
+import { badgeClass } from '~/utils/imcBadge'
 import { gerarId } from '~/utils/pessoasStorage'
 import type IPessoa from '~/interface/IPessoa'
 
 export default defineComponent({
   name: 'FormImc',
-  // Vue 3 / compat: declarar emits documenta o contrato do componente
   emits: ['formData'],
   data () {
     return {
       name: '',
       altura: 0,
       peso: 0,
-      empty: false
+      empty: false,
+      shake: false,
+      submitting: false,
+      savedFlash: false
     }
   },
   computed: {
-    /** Estado derivado: recalcula quando peso/altura mudam (preferível a duplicar no método). */
     imcPreview (): number {
       return calcularImc(Number(this.peso), Number(this.altura))
     },
     classificacaoPreview (): string {
       return classificarImc(this.imcPreview)
+    },
+    badgePreview (): string {
+      return badgeClass(this.imcPreview)
+    },
+    submitLabel (): string {
+      if (this.savedFlash) { return 'Salvo!' }
+      if (this.submitting) { return 'Salvando…' }
+      return 'Salvar cálculo'
     }
   },
   methods: {
+    onShakeEnd (event: Event) {
+      const animEvent = event as AnimationEvent
+      if (animEvent.animationName === 'shake') {
+        this.shake = false
+      }
+    },
     enviar () {
       const peso = Number(this.peso)
       const altura = Number(this.altura)
 
       if (!this.name.trim() || peso <= 0 || altura <= 0) {
         this.empty = true
+        this.shake = true
         return
       }
+
+      this.submitting = true
+      this.empty = false
 
       const imc = calcularImc(peso, altura)
       const pessoa: IPessoa = {
@@ -93,32 +139,18 @@ export default defineComponent({
         classificacao: classificarImc(imc)
       }
 
-      // $emit: comunicação filho → pai (padrão Vue; em Nuxt o pai costuma ser uma page)
       this.$emit('formData', pessoa)
 
       this.name = ''
       this.altura = 0
       this.peso = 0
-      this.empty = false
+      this.submitting = false
+      this.savedFlash = true
+
+      window.setTimeout(() => {
+        this.savedFlash = false
+      }, 700)
     }
   }
 })
 </script>
-
-<style scoped>
-.error {
-  color: #f14668;
-  margin-top: 0.5rem;
-}
-
-.imc-preview {
-  margin: 0.75rem 0;
-  color: #363636;
-}
-
-.help {
-  font-size: 0.85rem;
-  color: #7a7a7a;
-  margin-bottom: 0.75rem;
-}
-</style>

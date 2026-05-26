@@ -1,27 +1,67 @@
 <template>
-  <div class="field lista">
-    <label class="label">Nome</label>
-    <input v-model="name" class="input" type="text">
+  <div class="page form-page">
+    <header class="page-header anim-page-in">
+      <h1 class="page-header__title">
+        Editar registro
+      </h1>
+      <p class="page-header__lead">
+        Altere os dados e salve. O IMC é recalculado automaticamente.
+      </p>
+    </header>
 
-    <label class="label">Peso (kg)</label>
-    <input v-model.number="peso" class="input" type="number" min="1" step="0.1">
+    <section class="panel anim-page-in anim-page-in--delay">
+      <form @submit.prevent="salvar">
+        <div class="field">
+          <label class="label" for="edit-nome">Nome</label>
+          <input id="edit-nome" v-model="name" class="input" type="text">
+        </div>
 
-    <label class="label">Altura (m ou cm)</label>
-    <input v-model.number="altura" class="input" type="number" min="0.5" step="0.01">
+        <div class="form-imc__row">
+          <div class="field">
+            <label class="label" for="edit-peso">Peso (kg)</label>
+            <input
+              id="edit-peso"
+              v-model.number="peso"
+              class="input"
+              type="number"
+              min="1"
+              step="0.1"
+            >
+          </div>
+          <div class="field">
+            <label class="label" for="edit-altura">Altura (m ou cm)</label>
+            <input
+              id="edit-altura"
+              v-model.number="altura"
+              class="input"
+              type="number"
+              min="0.5"
+              step="0.01"
+            >
+          </div>
+        </div>
 
-    <label class="label">IMC</label>
-    <input class="input" type="text" :value="imcExibicao" disabled>
+        <div class="field">
+          <label class="label">IMC</label>
+          <input class="input" type="text" :value="imcExibicao" disabled>
+        </div>
 
-    <p v-if="erro" class="error">
-      {{ erro }}
-    </p>
+        <transition name="fade-slide">
+          <p v-if="erro" key="erro" class="form-page__error" role="alert">
+            {{ erro }}
+          </p>
+        </transition>
 
-    <div class="buttons">
-      <nuxt-link to="/create" class="button is-light">
-        <span class="material-symbols-outlined">arrow_back</span>
-      </nuxt-link>
-      <Buttons nome="check" class="button is-success" @clicado="salvar" />
-    </div>
+        <div class="actions-row">
+          <nuxt-link to="/create" class="button btn-icon" aria-label="Voltar">
+            <span class="material-symbols-outlined">arrow_back</span>
+          </nuxt-link>
+          <button type="submit" class="button btn-primary">
+            Salvar alterações
+          </button>
+        </div>
+      </form>
+    </section>
   </div>
 </template>
 
@@ -41,7 +81,6 @@ export default defineComponent({
     }
   },
   computed: {
-    /** $route.params.id vem de pages/edit/_id.vue (convenção Nuxt file-based routing) */
     pessoaId (): string {
       return String(this.$route.params.id)
     },
@@ -90,9 +129,3 @@ export default defineComponent({
   }
 })
 </script>
-
-<style scoped>
-.error {
-  color: #f14668;
-}
-</style>
