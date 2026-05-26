@@ -1,69 +1,76 @@
-# crud
+# Calculadora de IMC
 
-## Build Setup
+Projeto de estudo em **Nuxt.js 2** que implementa uma calculadora de **Índice de Massa Corporal (IMC)** com persistência no **localStorage** — sem backend.
+
+Este repositório nasceu como um **projeto legado** de aprendizado (CRUD simples) e foi **atualizado com pair programming assistido por IA**: correções de bugs, organização do código, design responsivo, animações leves e documentação dos conceitos do Nuxt/Vue.
+
+![Tela inicial da calculadora de IMC](docs/screenshot-home.png)
+
+## Propósito
+
+O objetivo não é ser um produto clínico, e sim **testar e aplicar conceitos básicos do Nuxt.js** em um fluxo completo:
+
+- File-based routing (`pages/`)
+- Layouts compartilhados
+- Componentes reutilizáveis (`props` / `emit`)
+- Ciclo de vida (`created`)
+- TypeScript em componentes e utilitários
+- Navegação SPA (`nuxt-link`, rotas dinâmicas `pages/edit/_id.vue`)
+- Persistência client-side com `localStorage` como “banco de dados”
+
+## Funcionalidades
+
+- Cálculo de IMC (peso em kg, altura em metros ou centímetros)
+- Classificação por faixa (OMS)
+- CRUD local: criar, listar, editar e excluir registros
+- Interface responsiva (tabela no desktop, cards no mobile)
+
+## Stack
+
+| Tecnologia | Uso |
+|------------|-----|
+| [Nuxt 2](https://nuxt.com/docs/2.x) | Framework Vue com convenções de pasta |
+| Vue 2.7 + TypeScript | Componentes e tipagem |
+| Bulma (CDN) | Base de componentes |
+| CSS customizado | Tema, responsividade e motion |
+| localStorage | Persistência dos registros |
+
+## Como rodar
+
+**Requisitos:** Node.js 16+ (recomendado) ou Node 17+ com o script já configurado (`--openssl-legacy-provider` para compatibilidade com Webpack 4).
 
 ```bash
-# install dependencies
-$ npm install
-
-# serve with hot reload at localhost:3000
-$ npm run dev
-
-# build for production and launch server
-$ npm run build
-$ npm run start
-
-# generate static project
-$ npm run generate
+npm install
+npm run dev
 ```
 
-For detailed explanation on how things work, check out the [documentation](https://nuxtjs.org).
+Acesse [http://localhost:3000](http://localhost:3000).
 
-## Special Directories
+Outros comandos:
 
-You can create the following extra directories, some of which have special behaviors. Only `pages` is required; you can delete them if you don't want to use their functionality.
+```bash
+npm run build    # build de produção
+npm run generate # export estático
+npm run lint     # ESLint
+```
 
-### `assets`
+## Estrutura do projeto
 
-The assets directory contains your uncompiled assets such as Stylus or Sass files, images, or fonts.
+```
+├── assets/css/       # Estilos globais
+├── components/       # Form, Table, Buttons
+├── docs/             # Imagens e documentação
+├── interface/        # Tipos TypeScript (IPessoa)
+├── layouts/          # Layout padrão + navegação
+├── pages/            # Rotas (index, create, edit, remove, about)
+└── utils/            # Cálculo de IMC e camada de storage
+```
 
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/assets).
+## Histórico
 
-### `components`
+- Versão inicial: exercício legado para praticar Nuxt e CRUD com `localStorage`
+- Evolução: refatoração guiada por IA (cálculo de IMC, rotas dinâmicas, storage centralizado, UI/UX e animações acessíveis)
 
-The components directory contains your Vue.js components. Components make up the different parts of your page and can be reused and imported into your pages, layouts and even other components.
+## Licença
 
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/components).
-
-### `layouts`
-
-Layouts are a great help when you want to change the look and feel of your Nuxt app, whether you want to include a sidebar or have distinct layouts for mobile and desktop.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/layouts).
-
-
-### `pages`
-
-This directory contains your application views and routes. Nuxt will read all the `*.vue` files inside this directory and setup Vue Router automatically.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/get-started/routing).
-
-### `plugins`
-
-The plugins directory contains JavaScript plugins that you want to run before instantiating the root Vue.js Application. This is the place to add Vue plugins and to inject functions or constants. Every time you need to use `Vue.use()`, you should create a file in `plugins/` and add its path to plugins in `nuxt.config.js`.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/plugins).
-
-### `static`
-
-This directory contains your static files. Each file inside this directory is mapped to `/`.
-
-Example: `/static/robots.txt` is mapped as `/robots.txt`.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/static).
-
-### `store`
-
-This directory contains your Vuex store files. Creating a file in this directory automatically activates Vuex.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/store).
+Projeto educacional — uso livre para estudo.
